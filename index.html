@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Подарочный сертификат</title>
+  <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Playfair+Display:wght@500&family=Poppins:wght@300&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --gold: #d7b98c;
+      --text: #5e5349;
+      --pink: #f8e9e9;
+      --glow: rgba(255, 255, 255, 0.5);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(45deg, #fff0f5, #ffe4e1);
+      font-family: 'Playfair Display', serif;
+      overflow: hidden;
+    }
+
+    .certificate-container {
+      position: relative;
+      width: 216mm; /* US Letter width */
+      height: 279mm; /* US Letter height */
+      padding: 20mm;
+      background: linear-gradient(45deg, #fffaf0, #fff5ee);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      overflow: hidden;
+      border: 2px solid var(--pink);
+      transform-style: preserve-3d;
+      transform-origin: top;
+      animation: openEnvelope 1.5s ease-in-out forwards;
+      box-sizing: border-box;
+    }
+
+    @keyframes openEnvelope {
+      0% {
+        transform: perspective(1000px) rotateX(-90deg);
+        opacity: 0;
+      }
+      100% {
+        transform: perspective(1000px) rotateX(0deg);
+        opacity: 1;
+      }
+    }
+
+    .certificate-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        transparent 20%, 
+        var(--glow) 50%, 
+        transparent 80%);
+      z-index: 1;
+      animation: glow 4s infinite;
+      pointer-events: none;
+    }
+
+    .brand {
+      font-family: 'Parisienne', cursive;
+      font-size: 4em; /* Увеличенный шрифт */
+      color: var(--gold);
+      margin: 15mm 0 10mm;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .gift-title {
+      font-size: 1.8em;
+      color: var(--text);
+      margin-bottom: 10mm;
+      letter-spacing: 1.5px;
+    }
+
+    .gift-title::after {
+      content: '';
+      display: block;
+      width: 80mm;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 8mm auto;
+    }
+
+    .course-select {
+      width: 80%;
+      padding: 4mm;
+      margin: 8mm auto;
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      font-size: 1.1em;
+      background: rgba(255,255,255,0.9);
+      color: var(--text);
+      font-family: 'Playfair Display', serif;
+      text-align: center;
+    }
+
+    .recipient-input {
+      width: 80%;
+      padding: 4mm;
+      margin: 10mm auto;
+      border: 2px dashed var(--gold);
+      font-size: 1.1em;
+      text-align: center;
+      background: rgba(255,255,255,0.9);
+      color: var(--text);
+      font-family: 'Playfair Display', serif;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15mm;
+      justify-content: center;
+      margin: 15mm 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    button {
+      padding: 2mm 10mm;
+      border: none;
+      border-radius: 35px;
+      background: linear-gradient(45deg, var(--gold), #c5a87e);
+      color: white;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1em;
+      box-shadow: 0 4px 15px rgba(199, 156, 109, 0.3);
+    }
+
+    .date {
+      color: var(--text);
+      font-size: 0.9em;
+      opacity: 0.8;
+      margin-top: auto; /* Дата внизу */
+      padding-top: 20mm; /* Отступ сверху */
+    }
+
+    .course-text {
+      color: var(--text);
+      font-size: 1.1em;
+      margin-top: 8mm;
+      font-style: italic;
+    }
+
+    @keyframes glow {
+      0% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+      100% { opacity: 0.3; }
+    }
+
+    @media (max-width: 216mm) {
+      .certificate-container {
+        width: 95%;
+        height: auto;
+        min-height: 279mm;
+        padding: 5mm;
+      }
+      
+      .brand {
+        font-size: 3em;
+        margin: 5mm 0;
+      }
+      
+      .recipient-input, .course-select {
+        width: 90%;
+        font-size: 1em;
+      }
+      
+      .controls {
+        flex-direction: column;
+        gap: 5mm;
+      }
+    }
+
+    .frame-decoration {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      background: 
+        linear-gradient(to right, var(--gold) 2px, transparent 2px) 0 0,
+        linear-gradient(to bottom, var(--gold) 2px, transparent 2px) 0 0,
+        linear-gradient(to left, var(--gold) 2px, transparent 2px) 100% 0,
+        linear-gradient(to top, var(--gold) 2px, transparent 2px) 0 100%;
+      background-repeat: no-repeat;
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="certificate-container">
+    <div class="frame-decoration"></div>
+    <div class="brand">Iminastylist</div>
+    <div class="gift-title">Подарочный сертификат</div>
+
+    <select class="course-select" id="courseSelect">
+      <option value="Сам себе визажист">Макияж для себя</option>
+      <option value="Базовый курс макияжа">Профессия визажист</option>
+      <option value="Свадебные прически">Стилист по свадебным и вечерним прическам</option>
+    </select>
+
+    <input type="text" 
+           class="recipient-input" 
+           placeholder="Введите имя получателя"
+           id="recipientName"
+           onclick="this.select()">
+
+    <div class="controls" id="controls">
+      <button onclick="downloadPDF()">Скачать PDF</button>
+      <button onclick="shareCertificate()">Поделиться</button>
+    </div>
+
+    <div class="course-text">На прохождение обучающего курса</div>
+    <div class="date" id="currentDate"></div> <!-- Дата внизу -->
+  </div>
+
+  <script>
+    // Автоматически добавляем параметр sender=true только при первом открытии
+    if (!window.location.search.includes('sender=')) {
+      const newURL = `${window.location.origin}${window.location.pathname}?sender=true`;
+      window.history.replaceState({}, '', newURL);
+    }
+
+    // Функция для чтения параметров из URL
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const isSender = getQueryParam('sender') === 'true';
+      const recipientName = getQueryParam('name');
+      const courseName = getQueryParam('course');
+
+      // Автозаполнение полей
+      if (recipientName) document.getElementById('recipientName').value = recipientName;
+      if (courseName) document.getElementById('courseSelect').value = courseName;
+
+      // Скрыть кнопки для получателя
+      if (!isSender) {
+        document.getElementById('controls').style.display = 'none';
+      }
+
+      // Конфетти только для отправителя
+      if (isSender) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    });
+
+    // Обновление URL при изменении данных
+    function updateURL() {
+      const params = new URLSearchParams();
+      params.set('sender', 'true');
+      params.set('name', document.getElementById('recipientName').value);
+      params.set('course', document.getElementById('courseSelect').value);
+      window.history.replaceState({}, '', `?${params.toString()}`);
+    }
+
+    document.getElementById('recipientName').addEventListener('input', updateURL);
+    document.getElementById('courseSelect').addEventListener('change', updateURL);
+
+    // Установка текущей даты
+    function setCurrentDate() {
+      const options = { day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('currentDate').textContent = 'Дата выдачи: ' + 
+        new Date().toLocaleDateString('ru-RU', options);
+    }
+    setCurrentDate();
+
+    // Скачивание PDF
+    async function downloadPDF() {
+      try {
+        const element = document.querySelector('.certificate-container');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: [216, 279]
+        });
+
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          logging: true,
+          backgroundColor: null
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 0, 0, 216, 279);
+        doc.save('Сертификат.pdf');
+      } catch (error) {
+        alert('Ошибка при генерации PDF: ' + error.message);
+      }
+    }
+
+    // Поделиться сертификатом
+    function shareCertificate() {
+      try {
+        const params = new URLSearchParams();
+        params.set('name', document.getElementById('recipientName').value);
+        params.set('course', document.getElementById('courseSelect').value);
+        
+        const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        const text = `🎁 ${params.get('name')} получил(а) подарочный сертификат на курс «${params.get('course')}» от Iminastylist!`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: 'Подарочный сертификат',
+            text: text,
+            url: url
+          });
+        } else {
+          const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`;
+          window.open(whatsappUrl, '_blank');
+        }
+      } catch (error) {
+        alert('Ошибка при отправке: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>
